@@ -1,0 +1,36 @@
+version: "3"
+services:
+
+  service-dockerfile:
+    image: java/dockerfile
+    container_name: jar-service-a-dockerfile    
+    deploy:
+      replicas: 1   #定义 replicated 模式的服务的复本数量
+      update_config:
+        parallelism: 1    #每次更新复本数量
+        delay: 2s       #每次更新间隔
+      restart_policy:
+        condition: on-failure     #定义服务的重启条件
+    networks:
+      - service-a-net
+    entrypoint: java -Xms50m -Xmx120m -XX:MaxPermSize=20M  -jar -Duser.timezone=GMT+08 /usr/service-a.jar
+    ports:
+      - "9000:8082"
+  service-load:
+    image: java/service-a-load
+    container_name: jar-service-a-load
+    deploy:
+      replicas: 1   #定义 replicated 模式的服务的复本数量
+      update_config:
+        parallelism: 1    #每次更新复本数量
+        delay: 2s       #每次更新间隔
+      restart_policy:
+        condition: on-failure     #定义服务的重启条件
+    networks:
+      - service-a-net
+    entrypoint: java -Xms50m -Xmx120m -XX:MaxPermSize=20M  -jar -Duser.timezone=GMT+08 /usr/service-a.jar
+    ports:
+      - "9001:8082"
+
+networks:
+  service-a-net:
